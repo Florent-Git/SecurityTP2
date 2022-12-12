@@ -1,3 +1,5 @@
+val exposedVersion: String by properties
+
 plugins {
     kotlin("jvm") version "1.7.20"
 }
@@ -10,6 +12,10 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
     testImplementation(kotlin("test"))
 }
 
