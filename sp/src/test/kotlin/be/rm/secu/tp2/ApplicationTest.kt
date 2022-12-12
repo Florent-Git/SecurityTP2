@@ -18,6 +18,7 @@ import io.ktor.client.statement.*
 import kotlin.test.*
 import io.ktor.server.testing.*
 import be.rm.secu.tp2.plugins.*
+import be.rm.secu.tp2.sp.plugins.configureRouting
 
 class ApplicationTest {
     @Test
