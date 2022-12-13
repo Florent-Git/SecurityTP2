@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Paiement</title>
+    <style>
+        body {font-family: Verdana, sans-serif;}
+    </style>
+</head>
+<body>
+<label>Bonjour {{user.name}} !</label>
+<form action = "/pay" method = post>
+    <p>
+        <label for="token">Code de l'ACQ:</label>
+        <input type="text" id="token" name="token">
+    </p>
+    <p>
+        <input type="submit" value="Payer" style="font-family: Verdana, sans-serif;">
+
+    </p>
+</form>
+</body>
+</html>
