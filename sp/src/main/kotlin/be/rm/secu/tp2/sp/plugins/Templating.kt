@@ -3,6 +3,7 @@ package be.rm.secu.tp2.sp.plugins
 import com.mitchellbosecke.pebble.loader.ClasspathLoader
 import io.ktor.server.pebble.*
 import io.ktor.server.application.*
+import io.ktor.server.html.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
