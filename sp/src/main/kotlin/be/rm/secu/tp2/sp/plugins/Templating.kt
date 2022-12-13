@@ -1,4 +1,4 @@
-package be.rm.secu.tp2.plugins
+package be.rm.secu.tp2.sp.plugins
 
 import com.mitchellbosecke.pebble.loader.ClasspathLoader
 import io.ktor.server.pebble.*
