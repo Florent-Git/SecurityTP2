@@ -1,7 +1,7 @@
 val exposedVersion: String by properties
 
 plugins {
-    kotlin("jvm") version "1.7.20"
+    id("kotlin-conventions")
 }
 
 group = "be.rm.secu.tp2"
@@ -18,10 +18,6 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.39.4.1")
 
     testImplementation(kotlin("test"))
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

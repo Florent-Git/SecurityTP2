@@ -1,6 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.7.20"
-    application
+    id("kotlin-conventions")
 }
 
 group = "be.rm.secu.tp2"
@@ -11,19 +10,9 @@ repositories {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":core")))
-    implementation(project(mapOf("path" to ":core")))
     testImplementation(kotlin("test"))
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
-}
-
-application {
-    mainClass.set("be.rm.secu.tp2.acs-client.ApplicationKt")
 }
