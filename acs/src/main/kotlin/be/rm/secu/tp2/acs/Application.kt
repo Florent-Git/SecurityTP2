@@ -26,13 +26,13 @@ fun main() {
         .handle { inbound, outbound ->
             inbound.receive()
                 .asString()
+                .log("IN")
                 .map {
                     "Echo: $it"
                 }
                 .flatMap {
                     outbound.sendString(Mono.just(it))
                 }
-                .log("IN")
                 .then()
         }
         .bindNow()
