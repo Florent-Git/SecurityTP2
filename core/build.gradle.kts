@@ -12,11 +12,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.xerial:sqlite-jdbc:3.39.4.1")
-
+    api("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    api("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    api("org.xerial:sqlite-jdbc:3.39.4.1")
     testImplementation(kotlin("test"))
 }
 
