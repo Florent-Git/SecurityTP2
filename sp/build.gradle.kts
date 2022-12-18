@@ -32,8 +32,12 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
-    // Add the network tls dependency from ktor
-    implementation("io.ktor:ktor-network-tls-jvm:$ktor_version")
+    implementation(platform("io.projectreactor:reactor-bom:2022.0.1"))
+    implementation ("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation ("io.projectreactor.netty:reactor-netty-core")
+
+    // Add reactor kotlin coroutines adapter
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

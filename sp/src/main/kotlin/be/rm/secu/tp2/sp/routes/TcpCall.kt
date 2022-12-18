@@ -1,14 +1,14 @@
 package be.rm.secu.tp2.sp.routes
 
-import io.ktor.network.selector.*
-import io.ktor.network.sockets.*
-import io.ktor.network.tls.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.utils.io.*
-import kotlinx.coroutines.Dispatchers
+import io.netty.handler.ssl.SslContextBuilder
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import reactor.core.publisher.Mono
+import reactor.netty.tcp.TcpClient
 import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
@@ -19,25 +19,40 @@ import javax.net.ssl.TrustManagerFactory
 
 fun Application.tcpCall() {
     routing {
-        // Create a socket that will send a request to the server on the port 27998
-        // Set the request as the body of the HTTP POST request
-        // Start the socket and wait for it to terminate
         post("/tcp") {
-            val request = call.receive<String>()
-            val socket = aSocket(SelectorManager(Dispatchers.IO))
-                .tcp()
-                .connect("acs.tp2.secu.rm.be", 27998)
-                .tls(coroutineContext) {
-                    trustManager = getTruststore()
+            // Receive the request from the HTTP POST request as a form parameter named "request"
+            val request = call.receiveParameters()["request"] ?: "No request"
+
+            // Create a TCP socket that will send a request to the server on the port 27998
+            // Create the client with reactor-netty
+            val client = TcpClient.create()
+                .host("acq.tp2.secu.rm.be")
+                .port(9276)
+                .secure {
+                    it.sslContext(
+                        SslContextBuilder
+                            .forClient()
+                            .trustManager(getTruststore())
+                            .build()
+                    )
                 }
+                .connectNow()
 
-            socket.openWriteChannel(autoFlush = true)
-                .writeStringUtf8(request)
+            // Send the request to the server
+            client.outbound()
+                .sendString(Mono.just(request))
+                .then()
+                .log("OUT")
+                .awaitFirstOrNull()
 
-            val response = socket.openReadChannel()
-                .readUTF8Line()
+            // Receive the response from the server
+            val response = client.inbound()
+                .receive()
+                .asString()
+                .awaitFirst()
 
-            call.respond(response ?: "No response")
+            // Send the response to the client
+            call.respond(response)
         }
     }
 }
@@ -45,7 +60,7 @@ fun Application.tcpCall() {
 fun getTruststore(): TrustManager {
     // Retrieve the /cert/ca.crt file
     val caCrt = Application::class.java.getResource("/cert/ca.crt")
-    val caCrtFile = File(caCrt.toURI())
+    val caCrtFile = caCrt?.toURI()?.let { File(it) } ?: throw Exception("Could not find ca.crt")
     val caCrtInputStream = FileInputStream(caCrtFile)
 
     // Create a CertificateFactory with the certificate provided
