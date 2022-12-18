@@ -39,6 +39,9 @@ dependencies {
     // Add reactor kotlin coroutines adapter
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
 
+    implementation("io.ktor:ktor-server-html-builder:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    implementation(project(":core"))
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
