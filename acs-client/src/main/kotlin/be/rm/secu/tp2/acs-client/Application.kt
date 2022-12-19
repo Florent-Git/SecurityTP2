@@ -27,22 +27,19 @@ import java.util.Scanner
 object Application
 fun main() {
     val scanner = Scanner(System.`in`)
-    val numCard:String
-    val monthCard:String
-    val yearCard:String
 
     System.out.println("=== Get your access token for payment ===")
     System.out.print("Enter the card number : ")
-    numCard = scanner.next()
+    val numCard: String = scanner.nextLine()
 
     System.out.print("Enter the card month of expiration : ")
-    monthCard = scanner.next()
+    val monthCard: String = scanner.nextLine()
 
     System.out.print("Enter the card year of expiration : ")
-    yearCard = scanner.next()
+    val yearCard: String = scanner.nextLine()
 
     //Création du message
-    val cardInfo = numCard + "." + monthCard + "." + yearCard
+    val cardInfo = "$numCard.$monthCard.$yearCard"
     val signature = getSignature(cardInfo)
     val out = ByteArrayOutputStream()
     val dataStream = DataOutputStream(out)
@@ -99,7 +96,7 @@ fun getSignature(message : String): ByteArray{
     val privateKey = kf.generatePrivate(spec)
 
     //Signature
-    val sign = Signature.getInstance("SHA1withRSA")
+    val sign = Signature.getInstance("SHA256withRSA")
     sign.initSign(privateKey)
     sign.update(message.toByteArray(Charset.defaultCharset()))
     return sign.sign()
@@ -118,7 +115,7 @@ fun verifySignature(signature : ByteArray){
         val signatureToken = signature.copyOfRange(tokenSize - 256, tokenSize)
         val message = signature.copyOfRange(0, tokenSize - 256)
         val verif = try {
-            val signatureLocale = Signature.getInstance("SHA1withRSA")
+            val signatureLocale = Signature.getInstance("SHA256withRSA")
             signatureLocale.initVerify(publicKey)
             signatureLocale.update(message)
             signatureLocale.verify(signatureToken)

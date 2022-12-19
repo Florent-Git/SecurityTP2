@@ -19,7 +19,7 @@ fun main() {
         }
         BasicUser.new {
             username = "rafuryc"
-            firstname = "Timothy"   
+            firstname = "Timothy"
             lastname = "Masset"
             val newSalt = Random.nextBytes(8)
             salt = newSalt.clone()
