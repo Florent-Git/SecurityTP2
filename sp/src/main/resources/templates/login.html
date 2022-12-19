@@ -1,26 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Connexion</title>
-    <style>
-        body {font-family: Verdana, sans-serif;}
-    </style>
-</head>
-<body>
-    <form action = "/login" method = post>
-        <p>
-            <label for="username">Nom d'utilisateur:</label>
-            <input type="text" id="username" name="username">
-        </p>
-        <p>
-            <label for="password">Mot de passe:</label>
-            <input type="password" id="password" name="password">
-        </p>
-        <p>
-            <input type="submit" value="Soumettre" style="font-family: Verdana, sans-serif;">
+{% extends "_layout.html" %}
 
-        </p>
-    </form>
-</body>
-</html>
+{% block content %}
+<form action="/login" method="POST">
+    <div class="m-5">
+        <label for="username">Nom d'utilisateur:</label>
+        <input class="border border-black p-2 rounded-xl" type="text" id="username" name="username">
+    </div>
+    <div class="m-5">
+        <label for="password">Mot de passe:</label>
+        <input class="border border-black p-2 rounded-xl" type="password" id="password" name="password">
+    </div>
+    <div class="m-5">
+        <input class="border border-teal-500 hover:border-black hover:bg-teal-500 hover:text-white p-2 rounded-xl"
+               type="submit" value="Soumettre" style="font-family: Verdana, sans-serif;">
+    </div>
+</form>
+{% endblock %}

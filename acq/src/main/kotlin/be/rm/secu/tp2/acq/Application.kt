@@ -35,7 +35,7 @@ fun main(): Unit = runBlocking {
                 .log("IN SP")
                 .flatMap {
                     outbound
-                        .sendString(Mono.just("Hello SP ! I received your message: $it"))
+                        .sendString(Mono.just("Hello SP ! I received your pay: $it €"))
                         .then()
                 }
                 .then()

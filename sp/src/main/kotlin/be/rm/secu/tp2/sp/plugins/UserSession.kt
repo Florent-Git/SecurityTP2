@@ -4,13 +4,11 @@ import be.rm.secu.tp2.core.model.BasicUser
 import be.rm.secu.tp2.core.model.BasicUsers
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.pebble.*
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import kotlinx.serialization.Serializable
-import java.security.MessageDigest
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.security.MessageDigest
 import java.util.*
 
 @Serializable
@@ -50,24 +48,6 @@ fun Application.configureAuthentication() {
             }
             challenge {
                 call.respondRedirect("/login")
-            }
-        }
-    }
-
-    routing {
-        authenticate("auth-form") {
-            post("/login") {
-                val userName = call.principal<UserIdPrincipal>()?.name.toString()
-                call.sessions.set(BasicUserSession(name = userName, count = 1))
-                call.respondRedirect("/pay")
-            }
-        }
-
-        authenticate("auth-session") {
-            get("/pay") {
-                val basicUserSession = call.principal<BasicUserSession>()
-                call.sessions.set(basicUserSession?.copy(count = basicUserSession.count + 1))
-                call.respond(PebbleContent("/pay.html", mapOf("user" to basicUserSession!!)))
             }
         }
     }

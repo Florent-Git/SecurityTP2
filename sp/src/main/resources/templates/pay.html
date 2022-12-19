@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Paiement</title>
-    <style>
-        body {font-family: Verdana, sans-serif;}
-    </style>
-</head>
-<body>
-<label>Bonjour {{user.name}} !</label>
-<form action = "/pay" method = post>
-    <p>
-        <label for="token">Code de l'ACQ:</label>
-        <input type="text" id="token" name="token">
-    </p>
-    <p>
-        <input type="submit" value="Payer" style="font-family: Verdana, sans-serif;">
+{% extends "_layout.html" %}
 
-    </p>
+{% block content %}
+<h1>Bonjour {{user.name}} !</h1>
+<form action="/pay" method="POST">
+    <div>
+        <label for="token">Code de l'ACQ:</label>
+        <input class="border border-black p-2 rounded-xl" type="text" id="token" name="token">
+    </div>
+    <div>
+        <label for="amount">Montant:</label>
+        <input class="border border-black p-2 rounded-xl" type="number" id="amount" name="amount">
+    </div>
+    <div>
+        <input class="border border-teal-500 hover:border-black hover:bg-teal-500 hover:text-white p-2 rounded-xl"
+               type="submit" value="Payer" style="font-family: Verdana, sans-serif;">
+    </div>
 </form>
-</body>
-</html>
+{% endblock %}
