@@ -11,7 +11,7 @@ plugins {
 group = "be.rm.secu.tp2"
 version = "0.0.1"
 application {
-    mainClass.set("be.rm.secu.tp2.ApplicationKt")
+    mainClass.set("be.rm.secu.tp2.sp.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -38,6 +38,9 @@ dependencies {
 
     // Add reactor kotlin coroutines adapter
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
+
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
 
     implementation("io.ktor:ktor-server-html-builder:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
