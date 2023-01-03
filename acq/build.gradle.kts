@@ -26,5 +26,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation(project(":core"))
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
