@@ -36,6 +36,13 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                     Button(onClick = { acsClientViewModel.sendToken() }) {
                         Text("Send token")
                     }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Response: ")
+                        Text(acsClientViewModel.response.value)
+                        Button(onClick = { acsClientViewModel.copyToClipboard() }) {
+                            Text("Copy")
+                        }
+                    }
                 }
             }
         }
