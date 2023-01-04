@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 
 class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
     @Composable
@@ -33,15 +35,19 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                         label = { Text("Token") },
                         placeholder = { Text("Enter your token") }
                     )
-                    Button(onClick = { acsClientViewModel.sendToken() }) {
+                    Button(onClick = {
+                        runBlocking {
+                            coroutineScope {
+                                acsClientViewModel.sendToken()
+                            }
+                        }
+                    }) {
                         Text("Send token")
                     }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Response: ")
-                        Text(acsClientViewModel.response.value)
-                        Button(onClick = { acsClientViewModel.copyToClipboard() }) {
-                            Text("Copy")
-                        }
+                    Text("Response: ")
+                    Text(acsClientViewModel.response.value)
+                    Button(onClick = { acsClientViewModel.copyToClipboard() }) {
+                        Text("Copy")
                     }
                 }
             }

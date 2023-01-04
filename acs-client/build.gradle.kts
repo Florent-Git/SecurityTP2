@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     // Add the compose plugin
     id("org.jetbrains.compose") version "1.2.2"
 }
@@ -29,6 +30,8 @@ dependencies {
 
     // Add the kotlinx datetime dependency
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     implementation("ch.qos.logback:logback-classic:1.4.5")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.20")

@@ -23,7 +23,7 @@ dependencies {
     implementation ("io.projectreactor.netty:reactor-netty-core")
 
     // Add the kotlinx.serialization dependency
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     testImplementation(kotlin("test"))
 }
