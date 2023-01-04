@@ -2,6 +2,7 @@ package be.rm.secu.tp2.core.io
 
 import java.io.InputStream
 import java.security.KeyFactory
+import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.cert.Certificate
@@ -21,6 +22,14 @@ object IO {
         // Return the public key
         return KeyFactory.getInstance("RSA")
             .generatePublic(PKCS8EncodedKeySpec(inputStream.readAllBytes()))
+    }
+
+    fun readKeystore(inputStream: InputStream, password: String): KeyStore {
+        // Read the keystore from the input stream
+        // Return the keystore
+        return KeyStore.getInstance("PKCS12").apply {
+            load(inputStream, password.toCharArray())
+        }
     }
 
     fun readCertificate(inputStream: InputStream): Certificate {

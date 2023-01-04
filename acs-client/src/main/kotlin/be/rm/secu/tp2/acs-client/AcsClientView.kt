@@ -30,8 +30,8 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     TextField(
-                        value = acsClientViewModel.token.value,
-                        onValueChange = { acsClientViewModel.token.value = it },
+                        value = acsClientViewModel.cardNumber.value,
+                        onValueChange = { acsClientViewModel.cardNumber.value = it },
                         label = { Text("Token") },
                         placeholder = { Text("Enter your token") }
                     )
@@ -44,11 +44,18 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                     }) {
                         Text("Send token")
                     }
-                    Text("Response: ")
-                    Text(acsClientViewModel.response.value)
-                    Button(onClick = { acsClientViewModel.copyToClipboard() }) {
-                        Text("Copy")
+                    if (acsClientViewModel.response.value != "") {
+                        Text("Response: ")
+                        Text(acsClientViewModel.response.value)
+                        Text("Valid from: ")
+                        Text(acsClientViewModel.startTime.value.toString())
+                        Text("Valid until: ")
+                        Text(acsClientViewModel.endTime.value.toString())
+                        Button(onClick = { acsClientViewModel.copyToClipboard() }) {
+                            Text("Copy")
+                        }
                     }
+
                 }
             }
         }

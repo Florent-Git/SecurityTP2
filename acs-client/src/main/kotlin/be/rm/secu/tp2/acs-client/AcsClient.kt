@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono
 import reactor.netty.tcp.TcpClient
 
 class AcsClient {
-    suspend fun sendToken(token: String): String {
+    suspend fun sendCardNumber(token: String): String {
         val fileInputStream = AcsClient::class.java.getResourceAsStream("/ca.crt")
 
         val client = TcpClient.create()
