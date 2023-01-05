@@ -21,6 +21,7 @@ class AcsClientViewModel(
 ) {
     val cardNumber = mutableStateOf("")
     val response = mutableStateOf("")
+    val totpCode = mutableStateOf("")
     val startTime = mutableStateOf<LocalDateTime?>(null)
     val endTime = mutableStateOf<LocalDateTime?>(null)
 
@@ -45,13 +46,14 @@ class AcsClientViewModel(
         val verifySignature = Signing.verify(tokenSignatureDecoded, totpTokenB64.toByteArray(), pubKey)
 
         if (verifySignature == true) {
-            response.value = totpToken.password
+            response.value = responseString
+            totpCode.value = totpToken.password
             startTime.value = Instant.fromEpochMilliseconds(totpToken.startEpoch)
                 .toLocalDateTime(TimeZone.currentSystemDefault())
             endTime.value = Instant.fromEpochMilliseconds(totpToken.endEpoch)
                 .toLocalDateTime(TimeZone.currentSystemDefault())
         } else {
-            response.value = "Signature verification failed"
+            totpCode.value = "Signature verification failed"
         }
     }
 

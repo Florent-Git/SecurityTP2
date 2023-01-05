@@ -1,6 +1,8 @@
 package be.rm.secu.tp2.sp.routes
 
-import be.rm.secu.tp2.sp.config.getTruststore
+import be.rm.secu.tp2.core.io.IO
+import be.rm.secu.tp2.core.net.BasicClient
+import be.rm.secu.tp2.sp.KtorApplication
 import be.rm.secu.tp2.sp.plugins.BasicUserSession
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -9,11 +11,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import io.netty.handler.ssl.SslContextBuilder
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import reactor.core.publisher.Mono
-import reactor.netty.tcp.TcpClient
 
 fun Application.payRoutes() {
     routing {
@@ -26,35 +23,21 @@ fun Application.payRoutes() {
 
             post("/pay") {
                 // Receive the request from the HTTP POST request as a form parameter named "request"
-                val request = call.receiveParameters()["amount"] ?: "No request"
+                val request = call.receiveParameters()["token"] ?: "No request"
+
+                val certificate = KtorApplication::class.java.getResourceAsStream("/cert/ca.crt").use { inputStream ->
+                    inputStream?.let { IO.readCertificate(it) } ?: throw Exception("No certificate")
+                }
 
                 // Create a TCP socket that will send a request to the server on the port 27998
                 // Create the client with reactor-netty
-                val client = TcpClient.create()
-                    .host("acq.tp2.secu.rm.be")
-                    .port(9276)
-                    .secure {
-                        it.sslContext(
-                            SslContextBuilder
-                                .forClient()
-                                .trustManager(getTruststore())
-                                .build()
-                        )
-                    }
-                    .connectNow()
+                val client = BasicClient(
+                    "acq.tp2.secu.rm.be",
+                    9568,
+                    certificate
+                )
 
-                // Send the request to the server
-                client.outbound()
-                    .sendString(Mono.just(request))
-                    .then()
-                    .log("OUT")
-                    .awaitFirstOrNull()
-
-                // Receive the response from the server
-                val response = client.inbound()
-                    .receive()
-                    .asString()
-                    .awaitFirst()
+                val response = client.sendRequest(request)
 
                 // Send the response to the client
                 call.respond(response)

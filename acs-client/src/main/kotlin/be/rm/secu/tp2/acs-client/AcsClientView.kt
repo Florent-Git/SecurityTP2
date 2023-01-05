@@ -32,8 +32,8 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                     TextField(
                         value = acsClientViewModel.cardNumber.value,
                         onValueChange = { acsClientViewModel.cardNumber.value = it },
-                        label = { Text("Token") },
-                        placeholder = { Text("Enter your token") }
+                        label = { Text("Card number") },
+                        placeholder = { Text("Enter your card number") }
                     )
                     Button(onClick = {
                         runBlocking {
@@ -42,7 +42,7 @@ class AcsClientView(private val acsClientViewModel: AcsClientViewModel) {
                             }
                         }
                     }) {
-                        Text("Send token")
+                        Text("Send card number")
                     }
                     if (acsClientViewModel.response.value != "") {
                         Text("Response: ")

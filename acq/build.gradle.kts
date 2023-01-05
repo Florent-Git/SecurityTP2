@@ -29,3 +29,7 @@ dependencies {
     implementation(project(":core"))
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
+
+tasks.getByName("run", JavaExec::class) {
+    standardInput = System.`in`
+}

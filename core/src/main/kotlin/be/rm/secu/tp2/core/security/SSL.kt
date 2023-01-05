@@ -18,9 +18,13 @@ object SSL {
             .build()
     }
 
-    fun createKeystoreSSLContext(inputStream: InputStream, alias: String, password: String): SslContext {
-        val keyStore = KeyStore.getInstance("PKCS12")
-        keyStore.load(inputStream, password.toCharArray())
+    fun createCertificateSSLContext(certificate: X509Certificate): SslContext {
+        return SslContextBuilder.forClient()
+            .trustManager(certificate)
+            .build()
+    }
+
+    fun createKeystoreSSLContext(keyStore: KeyStore, alias: String, password: String): SslContext {
         return SslContextBuilder.forServer(
             keyStore.getKey(alias, password.toCharArray()) as PrivateKey,
             keyStore.getCertificate(alias) as X509Certificate,

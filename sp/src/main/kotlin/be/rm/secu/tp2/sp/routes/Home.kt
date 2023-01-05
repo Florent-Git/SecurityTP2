@@ -9,11 +9,13 @@ import io.ktor.server.routing.*
 
 fun Application.home() {
     routing {
-        get("/") {
-            val user = call.principal() ?: BasicUserSession("anonymous", 0)
+        authenticate("auth-session", optional = true) {
+            get("/") {
+                val user = call.principal() ?: BasicUserSession("anonymous", 0)
 
-            // Respond the index page with the Products object
-            call.respond(PebbleContent("/index.html", mapOf("user" to user)))
+                // Respond the index page with the Products object
+                call.respond(PebbleContent("/index.html", mapOf("user" to user)))
+            }
         }
     }
 }

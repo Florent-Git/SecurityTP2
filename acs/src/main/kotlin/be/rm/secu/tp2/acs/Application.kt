@@ -1,48 +1,65 @@
 package be.rm.secu.tp2.acs
 
+import be.rm.secu.tp2.acs.card.HardcodedCardCodeProvider
+import be.rm.secu.tp2.acs.handlers.AuthServerRequestHandler
+import be.rm.secu.tp2.acs.handlers.MoneyServerRequestHandler
+import be.rm.secu.tp2.acs.rsaotp.SignatureAlgorithm
+import be.rm.secu.tp2.acs.rsaotp.TimeBasedSignatureOneTimePasswordConfig
+import be.rm.secu.tp2.core.io.IO
+import be.rm.secu.tp2.core.net.BasicServer
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 object Application
 
 fun main() {
-//    // Retrieve /certs/acq.p12 from the classpath
-//    val keystore = Application::class.java.getResourceAsStream("/cert/acs.keystore.p12")
-//
-//    // Create a TCP server that will listen on port 27998
-//    // Secure the server with the keystore provided
-//    // Start the server and wait for it to terminate
-//    TcpServer.create()
-//        .port(27998)
-//        .secure {
-//            it.sslContext(SSL.createKeystoreSSLContext(keystore, "acs", "acs"))
-//        }
-//        .handle { inbound, outbound ->
-//            inbound.receive()
-//                .asString()
-//                .log("IN")
-//                .map { ACSClientRequest. }
-//                .map(ACSClientRequestHandler::handleRequest)
-//                .map { Json.decodeFromString<ACSClientRequest>(it) }
-//                .flatMap {
-//                    outbound.sendString(Mono.just(it))
-//                }
-//                .then()
-//        }
-//        .bindNow()
-//        .onDispose()
-//        .block()
+    val keyStore = Application::class.java.getResourceAsStream("/cert/acs.keystore.p12").use { inputStream ->
+        inputStream?.let { IO.readKeystore(it, "hepl") } ?: throw Exception("Keystore not found")
+    }
+
+    val acsClientPubKey = Application::class.java.getResourceAsStream("/cert/acs-client.crt").use { inputStream ->
+        inputStream?.let { IO.readCertificate(it).publicKey } ?: throw Exception("Could not find acs-client.crt")
+    }
+
+    val totpConfig = TimeBasedSignatureOneTimePasswordConfig(
+        30L,
+        TimeUnit.SECONDS,
+        6,
+        SignatureAlgorithm.SHA256
+    )
+
+    val authServer = BasicServer(
+        27998, keyStore, "acs", "hepl", AuthServerRequestHandler(
+            acsClientPubKey,
+            HardcodedCardCodeProvider,
+            totpConfig
+        )
+    )
+
+    val moneyServer = BasicServer(
+        9276, keyStore, "acs", "hepl", MoneyServerRequestHandler(
+            keyStore,
+            totpConfig
+        )
+    )
 
     thread {
         runBlocking {
-            AuthServer.run()
+            authServer.run()
+        }
+    }
+
+    thread {
+        runBlocking {
+            moneyServer.run()
         }
     }
 
     print("Press any key to exit")
     readlnOrNull()
 
-    MoneyServer.stop()
-    AuthServer.stop()
+    moneyServer.stop()
+    authServer.stop()
 }
 

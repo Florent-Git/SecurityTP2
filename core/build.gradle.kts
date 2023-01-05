@@ -22,6 +22,8 @@ dependencies {
     implementation ("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation ("io.projectreactor.netty:reactor-netty-core")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
+
     // Add the kotlinx.serialization dependency
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
