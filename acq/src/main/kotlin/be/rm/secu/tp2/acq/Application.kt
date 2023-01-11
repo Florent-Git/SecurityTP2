@@ -22,7 +22,7 @@ fun main() {
 
     val client = BasicClient(
         "acs.tp2.secu.rm.be",
-        9798,
+        9276,
         caCertificate
     )
 
