@@ -1,46 +1,52 @@
 package be.rm.secu.tp2.acq
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.awaitFirstOrNull
+import be.rm.secu.tp2.core.io.IO
+import be.rm.secu.tp2.core.net.BasicClient
+import be.rm.secu.tp2.core.net.BasicServer
 import kotlinx.coroutines.runBlocking
-import reactor.core.publisher.Mono
+import java.util.logging.Logger
+import kotlin.concurrent.thread
 
 object Application
 
-fun main(): Unit = runBlocking {
-    val server = createServer(9276)
-    val acs by lazy { createClient("acs.tp2.secu.rm.be", 27998) }
+fun main() {
+    val logger = Logger.getLogger(Application::class.java.name)
 
-    launch(Dispatchers.IO) {
-        val con = acs.handle { inbound, outbound ->
-            inbound.receive()
-                .asString()
-                .log("IN ACS")
-                .then()
-        }.connectNow()
-
-        con.outbound()
-            .sendString(Mono.just("Hello ACS"))
-            .awaitFirstOrNull()
-
-        con.onDispose()
-            .awaitFirstOrNull()
+    val acqKeystore = Application::class.java.getResourceAsStream("/cert/acq.keystore.p12").use { inputStream ->
+        inputStream?.let { IO.readKeystore(it, "hepl") } ?: throw Exception("Keystore not found")
     }
 
-    launch(Dispatchers.IO) {
-        server.handle { inbound, outbound ->
-            inbound.receive()
-                .asString()
-                .log("IN SP")
-                .flatMap {
-                    outbound
-                        .sendString(Mono.just("Hello SP ! I received your pay: $it €"))
-                        .then()
-                }
-                .then()
-        }.bindNow()
-            .onDispose()
-            .awaitFirstOrNull()
+    val caCertificate = Application::class.java.getResourceAsStream("/cert/ca.crt").use { inputStream ->
+        inputStream?.let { IO.readCertificate(it) } ?: throw Exception("CA certificate not found")
     }
+
+    val client = BasicClient(
+        "acs.tp2.secu.rm.be",
+        9276,
+        caCertificate
+    )
+
+    val requestHandler = AcqServerRequestHandler(
+        client
+    )
+
+    val server = BasicServer(
+        9568,
+        acqKeystore,
+        "acq",
+        "hepl",
+        requestHandler
+    )
+
+    thread {
+        runBlocking {
+            server.run()
+        }
+    }
+
+    logger.info("Server started")
+    readlnOrNull()
+    logger.info("Stopping server")
+    server.stop()
+    logger.info("Server stopped")
 }

@@ -1,57 +1,65 @@
 package be.rm.secu.tp2.acs
 
-import reactor.core.publisher.Mono
-import reactor.netty.tcp.SslProvider.SslContextSpec
-import reactor.netty.tcp.TcpServer
-import java.io.File
-import java.io.FileInputStream
-import java.security.PrivateKey
-import java.security.cert.X509Certificate
+import be.rm.secu.tp2.acs.card.HardcodedCardCodeProvider
+import be.rm.secu.tp2.acs.handlers.AuthServerRequestHandler
+import be.rm.secu.tp2.acs.handlers.MoneyServerRequestHandler
+import be.rm.secu.tp2.acs.rsaotp.SignatureAlgorithm
+import be.rm.secu.tp2.acs.rsaotp.TimeBasedSignatureOneTimePasswordConfig
+import be.rm.secu.tp2.core.io.IO
+import be.rm.secu.tp2.core.net.BasicServer
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 object Application
 
 fun main() {
-    // Retrieve /certs/acq.p12 from the classpath
-    val keystore = Application::class.java.getResource("/cert/acs.keystore.p12")
+    val keyStore = Application::class.java.getResourceAsStream("/cert/acs.keystore.p12").use { inputStream ->
+        inputStream?.let { IO.readKeystore(it, "hepl") } ?: throw Exception("Keystore not found")
+    }
 
-    // Create a TCP server that will listen on port 27998
-    // Secure the server with the keystore provided
-    // Start the server and wait for it to terminate
-    TcpServer.create()
-        .port(27998)
-        .secure { sslContextSpec -> sslContextSpec.sslContext(
-            FileInputStream(File(keystore.toURI())),
-            "hepl"
-        )}
-        .handle { inbound, outbound ->
-            inbound.receive()
-                .asString()
-                .log("IN")
-                .map {
-                    "Echo: $it"
-                }
-                .flatMap {
-                    outbound.sendString(Mono.just(it))
-                }
-                .then()
-        }
-        .bindNow()
-        .onDispose()
-        .block()
-}
+    val acsClientPubKey = Application::class.java.getResourceAsStream("/cert/acs-client.crt").use { inputStream ->
+        inputStream?.let { IO.readCertificate(it).publicKey } ?: throw Exception("Could not find acs-client.crt")
+    }
 
-// Create an SSL context with a keystore and a password from the parameters
-// Return the SSL context
-fun SslContextSpec.sslContext(
-    keystoreFile: FileInputStream, password: String
-) {
-    val keyStore = java.security.KeyStore.getInstance("PKCS12")
-    keyStore.load(keystoreFile, password.toCharArray())
-    this.sslContext(
-        io.netty.handler.ssl.SslContextBuilder.forServer(
-            keyStore.getKey("acs", password.toCharArray()) as PrivateKey,
-            keyStore.getCertificate("acs") as X509Certificate,
-        ).build()
+    val totpConfig = TimeBasedSignatureOneTimePasswordConfig(
+        30L,
+        TimeUnit.SECONDS,
+        6,
+        SignatureAlgorithm.SHA256
     )
+
+    val authServer = BasicServer(
+        27998, keyStore, "acs", "hepl", AuthServerRequestHandler(
+            acsClientPubKey,
+            HardcodedCardCodeProvider,
+            totpConfig
+        )
+    )
+
+    val moneyServer = BasicServer(
+        9276, keyStore, "acs", "hepl", MoneyServerRequestHandler(
+            keyStore,
+            totpConfig
+        )
+    )
+
+    thread {
+        runBlocking {
+            authServer.run()
+        }
+    }
+
+    thread {
+        runBlocking {
+            moneyServer.run()
+        }
+    }
+
+    print("Press any key to exit")
+    readlnOrNull()
+
+    moneyServer.stop()
+    authServer.stop()
 }
 

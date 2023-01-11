@@ -14,7 +14,7 @@ fun Application.loginRoutes() {
             post("/login") {
                 val userName = call.principal<UserIdPrincipal>()?.name.toString()
                 call.sessions.set(BasicUserSession(name = userName, count = 1))
-                call.respondRedirect("/pay")
+                call.respondRedirect("/")
             }
         }
 

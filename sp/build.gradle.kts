@@ -1,6 +1,7 @@
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "1.7.22"
@@ -11,7 +12,7 @@ plugins {
 group = "be.rm.secu.tp2"
 version = "0.0.1"
 application {
-    mainClass.set("be.rm.secu.tp2.ApplicationKt")
+    mainClass.set("be.rm.secu.tp2.sp.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -38,6 +39,14 @@ dependencies {
 
     // Add reactor kotlin coroutines adapter
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
+
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.xerial:sqlite-jdbc:3.39.4.1")
 
     implementation("io.ktor:ktor-server-html-builder:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")

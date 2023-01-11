@@ -9,10 +9,14 @@ import java.security.MessageDigest
 import kotlin.random.Random
 
 object Db {
-    fun configureDatabase(){
-        val url = javaClass.classLoader.getResource("/data/db.sqlite")
-        Database.connect("jdbc:sqlite:${url?.path}", driver = "org.sqlite.JDBC")
-        transaction { SchemaUtils.createMissingTablesAndColumns(BasicUsers) }
+    fun configureDatabase(url: String? = javaClass.classLoader.getResource("/data/db.sqlite")?.path) {
+        val fullPath = "jdbc:sqlite:${url}"
+        Database.connect(fullPath, driver = "org.sqlite.JDBC")
+        transaction {
+            SchemaUtils.createMissingTablesAndColumns(
+                BasicUsers
+            )
+        }
     }
 
     fun initDatabase(){

@@ -18,7 +18,7 @@ fun Application.configureAuthentication() {
     install(Sessions) {
         cookie<BasicUserSession>("user_session") {
             cookie.path = "/"
-            cookie.maxAgeInSeconds = 60
+            cookie.maxAgeInSeconds = 600
             transform(SessionTransportTransformerEncrypt("1234567891234567".toByteArray(), "1234567891234567".toByteArray()))
         }
     }
